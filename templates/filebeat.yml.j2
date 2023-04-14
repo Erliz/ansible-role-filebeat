@@ -13,10 +13,14 @@ output:
     # Array of hosts to connect to.
     hosts: {{ filebeat_output_elasticsearch_hosts | to_json }}
 
-    # Optional protocol and basic auth credentials. These are deprecated.
-    #protocol: "https"
-    #username: "admin"
-    #password: "s3cr3t"
+    # Optional auth via API Key or username/password.
+    # The options are mutually exclusive and api_key takes the precedence.
+    {%- if 'api_key' in filebeat_output_elasticsearch_auth +%}
+    api_key: "{{ filebeat_output_elasticsearch_auth.api_key }}"
+    {%- elif 'username' in filebeat_output_elasticsearch_auth +%}
+    username: "{{ filebeat_output_elasticsearch_auth.username }}"
+    password: "{{ filebeat_output_elasticsearch_auth.password }}"
+    {%- endif %}
 
     # Number of workers per Elasticsearch host.
     #worker: 1
@@ -60,13 +64,13 @@ output:
     # ssl configuration. By default is off.
     ssl:
       # List of root certificates for HTTPS server verifications
-      certificate_authorities: ["{{ filebeat_ssl_dir }}/{{ filebeat_ssl_certificate_file | basename }}"]
+      certificate_authorities: ["{{ filebeat_ssl_certs_dir }}/{{ filebeat_ssl_ca_file | basename }}"]
 
       # Certificate for TLS client authentication
-      certificate: "{{ filebeat_ssl_dir }}/{{ filebeat_ssl_certificate_file | basename }}"
+      certificate: "{{ filebeat_ssl_certs_dir }}/{{ filebeat_ssl_certificate_file | basename }}"
 
       # Client Certificate Key
-      key: "{{ filebeat_ssl_dir }}/{{ filebeat_ssl_key_file | basename}}"
+      key: "{{ filebeat_ssl_private_dir }}/{{ filebeat_ssl_key_file | basename}}"
 
       # Controls whether the client verifies server certificates and host name.
       # If insecure is set to true, all server host names and certificates will be
@@ -109,13 +113,13 @@ output:
     # ssl configuration. By default is off.
     ssl:
       # List of root certificates for HTTPS server verifications
-      certificate_authorities: ["{{ filebeat_ssl_dir }}/{{ filebeat_ssl_certificate_file | basename }}"]
+      certificate_authorities: ["{{ filebeat_ssl_certs_dir }}/{{ filebeat_ssl_ca_file | basename }}"]
 
       # Certificate for TLS client authentication
-      certificate: "{{ filebeat_ssl_dir }}/{{ filebeat_ssl_certificate_file | basename }}"
+      certificate: "{{ filebeat_ssl_certs_dir }}/{{ filebeat_ssl_certificate_file | basename }}"
 
       # Client Certificate Key
-      key: "{{ filebeat_ssl_dir }}/{{ filebeat_ssl_key_file | basename}}"
+      key: "{{ filebeat_ssl_private_dir }}/{{ filebeat_ssl_key_file | basename}}"
 
       # Controls whether the client verifies server certificates and host name.
       # If insecure is set to true, all server host names and certificates will be
